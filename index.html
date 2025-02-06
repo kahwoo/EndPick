@@ -1,1 +1,125 @@
-test
+<!DOCTYPE html>
+<head>
+	<link rel="stylesheet" type="text/css" href="scripts/allmy.css">
+	<script src="http://code.jquery.com/jquery-latest.js"></script>
+	<script src="/scripts/loadbook.js"></script> <!-- Hot linking doesnt work yet, Click on "Go to Menu" and pick a book -->
+	<meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+	
+<style>
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.top-container {
+  background-color: #f1f1f1;
+  padding: 30px;
+  text-align: center;
+}
+
+.header {
+  padding: 10px 16px;
+  background: #555;
+  color: #f1f1f1;
+}
+
+.content {
+  padding: 16px;
+}
+
+.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+.sticky + .content {
+  padding-top: 102px;
+}
+</style>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-60035027-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-60035027-1');
+</script>
+
+<!-- Hotjar Tracking Code for -->
+
+<script>
+(function(h,o,t,j,a,r){ h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+h._hjSettings={hjid:2598658,hjsv:6};
+a=o.getElementsByTagName('head')[0];
+r=o.createElement('script');r.async=1; r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+a.appendChild(r);
+})(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>  
+
+</head>
+<script type="text/javascript" >
+$(document).ready( function() {
+
+	$( '#container' ).html( '<ul class="filetree start"><li class="wait">' + 'Gathering books...' + '<li></ul>' );
+	
+	getfilelist( $('#container') , 'book' );
+	
+	function getfilelist( cont, root ) {
+	
+		$( cont ).addClass( 'wait' );
+			
+		$.post( 'listbooks.php', { dir: root }, function( data ) {
+	
+			$( cont ).find( '.start' ).html( '' );
+			$( cont ).removeClass( 'wait' ).append( data );
+			if( 'book' == root ) 
+				$( cont ).find('UL:hidden').show();
+			else 
+				$( cont ).find('UL:hidden').slideDown({ duration: 500, easing: null });
+			
+		});
+	}
+	
+	$( '#container' ).on('click', 'LI A', function() {
+		var entry = $(this).parent();
+		
+		if( entry.hasClass('folder') ) {
+			if( entry.hasClass('collapsed') ) {
+						
+				entry.find('UL').remove();
+				getfilelist( entry, escape( $(this).attr('rel') ));
+				entry.removeClass('collapsed').addClass('expanded');
+			}
+			else {
+				
+				entry.find('UL').slideUp({ duration: 500, easing: null });
+				entry.removeClass('expanded').addClass('collapsed');
+			}
+		} else {
+			$( '#selected_book' ).text("Loading book");
+			$output = $(this).attr( 'rel' )
+			window.location='bookreader.php' + "#" + $output;
+		}
+	return $output; 
+	});
+	
+});
+</script>
+</head>
+<body>
+<!--<?php include_once("/scripts/analytics.php") ?> -->
+<div class="header" id="myHeader">
+  <span> Welcome to Endpick's Pages Project</span>
+</div>
+	</br>
+<span>  Why don't ya pick a book or something? </span>
+
+<div id="selected_book"></div>
+<div id="container"> </div>
+<div> Wanna write your own book? <a href="/BookTemplate.txt">Click here</a> 
+<span id="ss-unsupported" class="api-support hidden">Google Speech Synthesis API is not supported in this browser</span>
+<?php include_once("navigation.php"); ?></body>
+
+</html>	
